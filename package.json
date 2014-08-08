@@ -1,0 +1,29 @@
+{
+  "name": "generator-django",
+  "version": "0.0.1",
+  "description": "Generator for django bootstrap projects",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erickbelfy/generator-django.git"
+  },
+  "keywords": [
+    "django",
+    "generator",
+    "django-generator",
+    "modules-bootstrap",
+    "bootstrap"
+  ],
+  "author": "Erick Belfort",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/erickbelfy/generator-django/issues"
+  },
+  "homepage": "https://github.com/erickbelfy/generator-django",
+  "devDependencies": {
+    "yeoman-generator": "^0.17.2"
+  }
+}
