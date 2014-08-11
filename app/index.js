@@ -74,13 +74,20 @@ var GeneratorDjango = yeoman.generators.Base.extend({
   },
 
   configure: function () {
-    console.log(cyan('Create folder structure in:   ') + magenta(this.workspace));
-    this.destinationRoot(this.workspace + this.Project);
+    console.log(cyan('Create folder structure in:') + ' --- ' + magenta(this.workspace));
+    this.destinationRoot(this.workspace + this.project);
+
+    this.defaultConfig = function () {
+      exec('git clone git@github.com:rcdigital/django-settings.git', this.onCommandHasDone.bind(this));
+    };
+
+    this.onCommandHasDone = function (error, stdout, stderr) {
+      sys.puts(stdout);
+    };
   },
 
   install: function () {
     console.log(cyan('Install django base structure...'));
-    exec('git clone ');
   }
 
 });
