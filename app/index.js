@@ -1,13 +1,21 @@
 'use strict';
 var yeoman = require('yeoman-generator');
+var chalk = require('chalk');
 var gh = require('github');
 var Q = require('q');
+
+var yellow = chalk.yellow;
+var cyan = chalk.cyan;
 
 var GeneratorDjango = yeoman.generators.Base.extend({
   constructor: function () {
     yeoman.generators.Base.apply(this, arguments);
     console.log(this.yeoman);
-    this.availableModules = [];
+    this.choicesModules = [];
+    this.modules = {};
+    this.selectedModules = [];
+    this.project = null;
+    this.workspace = null;
   },
 
   getAvailableRepos: function () {
@@ -19,7 +27,8 @@ var GeneratorDjango = yeoman.generators.Base.extend({
     this.onLoadReposiroies = function (err, res) {
         var filteredModules = res.filter(this.filterList);
         for (var x = 0, l = filteredModules.length; x < l; x++) {
-            this.availableModules.push({name: filteredModules[x].name, ssh_url: filteredModules[x].ssh_url});    
+          this.choicesModules.push({name: filteredModules[x].name, ssh_url: filteredModules[x].ssh_url});
+          this.modules[filteredModules[x].name] = {name: filteredModules[x].name, ssh_url: filteredModules[x].ssh_url};
         }
     };
 
@@ -42,23 +51,30 @@ var GeneratorDjango = yeoman.generators.Base.extend({
       {
         type: 'input',
         name: 'workspace',
-        message: 'Path to project: (ex: /Home/foo/workspace/)'
+        message: 'Workspace absolute folder: (ex: /Home/foo/workspace/)'
       },
       {
         type: 'checkbox',
         name: 'modules',
-        message: 'Choose with module you want to your application:',
+        message: 'Which modules you want to install in your application:',
         choices: this.availableModules
       }
     ];
 
-    this.onQuestionHasAnswered = function (asnwer) {
-      console.log(asnwer);
+    this.onQuestionHasAnswered = function (answer) {
+      this.project = answer.projectName;
+      this.workspace = answer.workspace;
+      this.selectedModules = answer.modules;
       done();
     };
 
     this.prompt(prompts, this.onQuestionHasAnswered.bind(this));
   },
+
+  configure: function () {
+    console.log(cyan('Create folder structure in:') + yellow(this.workspace));
+    this.destinationRoot(this.workspace + this.Project);
+  }
 
 });
 

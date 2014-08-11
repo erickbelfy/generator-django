@@ -27,5 +27,8 @@
     "github": "^0.2.1",
     "q": "^1.0.1",
     "yeoman-generator": "^0.17.2"
+  },
+  "dependencies": {
+    "chalk": "^0.5.1"
   }
 }
