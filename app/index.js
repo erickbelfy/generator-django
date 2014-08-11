@@ -3,8 +3,10 @@ var yeoman = require('yeoman-generator');
 var chalk = require('chalk');
 var gh = require('github');
 var Q = require('q');
+var sys = require('sys');
+var exec = require('child_process').exec;
 
-var yellow = chalk.yellow;
+var magenta = chalk.magenta;
 var cyan = chalk.cyan;
 
 var GeneratorDjango = yeoman.generators.Base.extend({
@@ -57,7 +59,7 @@ var GeneratorDjango = yeoman.generators.Base.extend({
         type: 'checkbox',
         name: 'modules',
         message: 'Which modules you want to install in your application:',
-        choices: this.availableModules
+        choices: this.choicesModules
       }
     ];
 
@@ -72,8 +74,13 @@ var GeneratorDjango = yeoman.generators.Base.extend({
   },
 
   configure: function () {
-    console.log(cyan('Create folder structure in:') + yellow(this.workspace));
+    console.log(cyan('Create folder structure in:   ') + magenta(this.workspace));
     this.destinationRoot(this.workspace + this.Project);
+  },
+
+  install: function () {
+    console.log(cyan('Install django base structure...'));
+    exec('git clone ');
   }
 
 });
