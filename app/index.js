@@ -5,9 +5,13 @@ var gh = require('github');
 var Q = require('q');
 var sys = require('sys');
 var exec = require('child_process').exec;
+var rm = require('shelljs').rm;
+var cp = require('shelljs').cp;
 
 var magenta = chalk.magenta;
 var cyan = chalk.cyan;
+var red = chalk.red;
+var green = chalk.green;
 
 var GeneratorDjango = yeoman.generators.Base.extend({
   constructor: function () {
@@ -74,16 +78,35 @@ var GeneratorDjango = yeoman.generators.Base.extend({
   },
 
   configure: function () {
+    var done = this.async();
     console.log(cyan('Create folder structure in:') + ' --- ' + magenta(this.workspace));
     this.destinationRoot(this.workspace + this.project);
 
-    this.defaultConfig = function () {
-      exec('git clone git@github.com:rcdigital/django-settings.git', this.onCommandHasDone.bind(this));
-    };
-
-    this.onCommandHasDone = function (error, stdout, stderr) {
+    exec('git clone git@github.com:rcdigital/django-settings.git', function (error, stdout, stderr) {
       sys.puts(stdout);
-    };
+      console.log(red('*') + ' ' +green('Copy fabric file.'));
+      cp(this.destinationRoot() + '/django-settings/fabfile.py', this.destinationRoot() +  '/fabfile.py');
+      console.log(red('*') + ' ' +green('Copy requirements file.'));
+      cp( this.destinationRoot() + '/django-settings/requirements.txt', this.destinationRoot() + '/requirements.txt');
+      rm('-rf', this.destinationRoot() + '/django-settings');
+      done();
+    }.bind(this));
+
+    console.log(cyan('Configuring virutal environment...'));
+    exec('virtualenv --distribute env', function (error, stdout, stderr) {
+      sys.puts(stdout);
+      exec('source env/bin/activate');
+      console.log(red('*') + ' ' + green('Installing Dependencies...'));
+      exec('pip install -r requirements.txt', function (error, stdout, stderr) {
+        if (error !== null) {
+          console.log(error);
+          return;
+        }
+        console.log(cyan('Dependencies are installed'));
+        done();
+      });
+    });
+
   },
 
   install: function () {
