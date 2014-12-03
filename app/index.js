@@ -5,9 +5,10 @@ var gh = require('github');
 var Q = require('q');
 var sys = require('sys');
 var log = require('simple-output');
-var exec = require('child_process').exec;
+var exec = require('shelljs').exec;
 var rm = require('shelljs').rm;
 var cp = require('shelljs').cp;
+var pwd = require('shelljs').pwd;
 
 var magenta = chalk.magenta;
 var cyan = chalk.cyan;
@@ -83,30 +84,28 @@ var GeneratorDjango = yeoman.generators.Base.extend({
     console.log(cyan('Create folder structure in:') + ' --- ' + magenta(this.workspace));
     this.destinationRoot(this.workspace + this.project);
 
-    exec('git clone git@github.com:rcdigital/django-settings.git', function (error, stdout, stderr) {
-      log.success(stdout);
+    exec('git clone git@github.com:rcdigital/django-settings.git', function (code, output) {
       log.success('Copy fabric file.');
       cp(this.destinationRoot() + '/django-settings/fabfile.py', this.destinationRoot() +  '/fabfile.py');
       log.success('Copy requirements file.');
       cp( this.destinationRoot() + '/django-settings/requirements.txt', this.destinationRoot() + '/requirements.txt');
       rm('-rf', this.destinationRoot() + '/django-settings');
+      log.success('VM has installed');
       done();
     }.bind(this));
 
     console.log(cyan('Configuring virtual environment...'));
-    exec('virtualenv --distribute env', function (error, stdout, stderr) {
-      log.success(stdout);
+    exec('virtualenv --distribute env', function (code, output) {
       exec('source env/bin/activate');
+      console.log(pwd());
       console.log(red('*') + ' ' + green('Installing Dependencies...'));
-      exec('pip install -r requirements.txt', function (error, stdout, stderr) {
-        if (error !== null) {
-          log.error(error);
-          return;
-        }
+      exec('pip install -r  requirements.txt', function (code, output) {
+        log.error(code);
+        log.error(output);
         log.success('Dependencies are installed');
         done();
-      });
-    });
+      }.bind(this));
+    }.bind(this));
 
   },
 
@@ -116,12 +115,8 @@ var GeneratorDjango = yeoman.generators.Base.extend({
     var nextModule = 0;
     this.cloneRepository = function (repoUrl) {
       console.log(red('* ') + green('Cloning repository ' + repoUrl));
-      exec('git clone ' + repoUrl, function (error, stdout, stderr) {
-        if (error === null) {
-          log.error(error);
-          return;
-        }
-        log.message(stdout);
+      exec('git clone ' + repoUrl, function (code, output) {
+        log.message(output);
         nextModule++;
         if (this.selectedModules[nextModule] !== undefined) {
           this.cloneRepository.call(this, this.modules[this.selectedModules[nextModule]].ssh_url);
